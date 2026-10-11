@@ -1,7 +1,8 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
+const apiRoutes = require('./routes/api');
 
 dotenv.config();
 
@@ -13,38 +14,28 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/health', (req, res) => {
-  res.json({
-    ok: true,
-    message: 'Hoàng Gia API is running',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ ok: true, message: 'Hoàng Gia API is running', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/env-check', (req, res) => {
-  res.json({
-    port: PORT,
-    nodeEnv: process.env.NODE_ENV || 'development',
-    dbHost: process.env.DB_HOST || 'not-configured'
-  });
-});
+app.use('/api', apiRoutes);
 
-app.use('/api', require('./routes/api'));
+const rootDir = path.join(__dirname, '..');
+const appFile = path.join(rootDir, 'app_xuong_in_v68 (5).html');
 
 app.get('/', (req, res) => {
-  const htmlPath = path.join(__dirname, '..', 'app_xuong_in_v68 (5).html');
-  res.sendFile(htmlPath, (err) => {
+  res.sendFile(appFile, (err) => {
     if (err) {
       res.status(404).send('Không tìm thấy file app_xuong_in_v68 (5).html');
     }
   });
 });
 
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(rootDir));
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Hoàng Gia backend running on http://localhost:${PORT}`);
+  console.log(`Hoàng Gia backend is running at http://localhost:${PORT}`);
 });
